@@ -39,7 +39,7 @@ body.in-cat .back { visibility: visible; }
 .pills { position: sticky; top: 78px; z-index: 9; background: var(--ink); }
 .pills-inner { max-width: 640px; margin: 0 auto; display: flex; gap: 10px; overflow-x: auto; padding: 14px 16px; scrollbar-width: none; }
 .pills-inner::-webkit-scrollbar { display: none; }
-.pill { flex: none; border: 2px solid var(--line); background: #1a1a1a; border-radius: 999px; padding: 10px 20px; font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; white-space: nowrap; line-height: 1.2; padding-top: 12px; }
+.pill { flex: none; border: 2px solid var(--line); background: #1a1a1a; border-radius: 999px; padding: 10px 20px; font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; white-space: nowrap; line-height: 1.2; padding-top: 12px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; }
 .pill[aria-current="true"] { background: var(--paper); color: var(--ink); border-color: var(--paper); }
 
 main { max-width: 640px; margin: 0 auto; padding: 4px 16px 48px; }
@@ -76,7 +76,7 @@ main { max-width: 640px; margin: 0 auto; padding: 4px 16px 48px; }
 .item h3 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 21px; letter-spacing: .03em; text-transform: uppercase; line-height: 1.15; padding-top: 4px; }
 .price { font-family: var(--display); font-weight: 700; font-size: 22px; white-space: nowrap; font-variant-numeric: tabular-nums; line-height: 1; padding-top: 4px; }
 .price sup { font-size: .55em; vertical-align: top; position: relative; top: -.1em; margin-left: 1px; }
-.meta { font-size: 12.5px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.meta { font-size: 14px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
 .desc { margin: 0; color: #d6d6d6; font-size: 15.5px; }
 .tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .tag { font-size: 11px; padding: 3px 9px; border-radius: 999px; border: 1px solid #555; color: #ddd; letter-spacing: .04em; }
@@ -205,6 +205,16 @@ const MENU = [
     { n: "Forst Premium", g: "Bionda", sizes: [["0,2 l", 3], ["0,3 l", 3.5], ["0,4 l", 4.5], ["0,5 l", 5.5], ["Caraffa 1 l", 10]] },
     { n: "Forst Sixtus", g: "Rossa doppio malto", sizes: [["0,2 l", 3.5], ["0,3 l", 4], ["0,4 l", 5], ["0,5 l", 6], ["Caraffa 1 l", 11]] },
   ]},
+  { id: "vini", title: "Vini bianchi, Franciacorta e Champagne", sub: "La nostra carta vini", items: [
+    { n: "Tufilla, Simone Capecci", p: 25, g: "Bianco, 12,5%" },
+    { n: "Ciprea, Simone Capecci", p: 28, g: "Bianco, 13%" },
+    { n: "Chiodo, Simone Capecci", p: 28, g: "Bianco, 12,5%" },
+    { n: "Müller Thurgau, Cantina Kellerei", p: 28, g: "Bianco, 12,5%" },
+    { n: "Gewürztraminer, Terlan", p: 30, g: "Bianco, 14%" },
+    { n: "Agemasi, Brut", p: 35, g: "Franciacorta, 12%" },
+    { n: "Contadi Castaldi, Brut", p: 35, g: "Franciacorta, 12,5%" },
+    { n: "Bellavista", p: 55, g: "Franciacorta, 12%" },
+  ]},
   { id: "pizzerosse", title: "Pizze rosse", sub: "Con base di pomodoro", foot: "Correzioni: bufala, salumi o patatine fritte € 1,50 · altre correzioni € 1,00", items: [
     { n: "Marinara", p: 5, i: "Pomodoro, aglio, olio" },
     { n: "Margherita", p: 7, i: "Pomodoro, mozzarella" },
@@ -244,6 +254,7 @@ const ICONS = {
   pizzerosse: '<path d="M32 8 8 52c15 7 33 7 48 0z"/><path d="M12 45c13 5 27 5 40 0"/><circle cx="30" cy="26" r="3.5"/><circle cx="24" cy="38" r="3.5"/><circle cx="38" cy="37" r="3.5"/>',
   pizzebianche: '<circle cx="32" cy="32" r="24"/><circle cx="32" cy="32" r="18"/><path d="M32 14v36M14 32h36M19 19l26 26M45 19 19 45"/>',
   pinsa: '<ellipse cx="32" cy="32" rx="26" ry="17"/><ellipse cx="32" cy="32" rx="20" ry="11.5"/><circle cx="24" cy="30" r="2.5"/><circle cx="36" cy="35" r="2.5"/><circle cx="40" cy="27" r="2.5"/>',
+  vini: '<path d="M14 8h14c0 12-2 20-7 20S14 20 14 8z"/><path d="M21 28v18M15 50h12"/><path d="M15 15h12"/><path d="M40 6h6v8c0 3 5 5 5 10v30a3 3 0 0 1-3 3h-10a3 3 0 0 1-3-3V24c0-5 5-7 5-10z"/><path d="M35 30h16v12H35z"/>',
   bibite: '<path d="M20 12h24v42a3 3 0 0 1-3 3H23a3 3 0 0 1-3-3z"/><path d="M22 8h20l2 4H20z"/><path d="M28 6c0-2 2-3 4-3"/><path d="M20 24h24M20 44h24"/>',
 };
 const CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
