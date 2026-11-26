@@ -93,12 +93,10 @@ main { max-width: 640px; margin: 0 auto; padding: 4px 16px 48px; }
 .info { margin-top: 22px; background: var(--card); border-radius: 18px; padding: 24px 22px; text-align: center; display: grid; gap: 8px; }
 .info h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: .03em; }
 .info p { margin: 0; color: #cfcfcf; }
-.next { position: relative; overflow: hidden; display: grid; gap: 4px; width: 100%; margin-top: 26px; padding: 22px 20px 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); text-align: center; cursor: pointer; }
-.next-fill { position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: var(--paper); transition: width .08s linear; }
-.next-label { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-.next-title { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: .04em; text-transform: uppercase; }
-.next-title::after { content: " ↓"; }
-.next-hint { font-size: 12.5px; color: #777; }
+.sec-hero { height: 132px; border-radius: 18px; margin: 22px 0 14px; }
+.sec:first-child .sec-hero { margin-top: 6px; }
+.sec-hero h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(24px, 7vw, 32px); letter-spacing: .05em; text-transform: uppercase; line-height: 1.05; text-wrap: balance; }
+.hero.sec-hero p { letter-spacing: .02em; text-transform: none; font-family: var(--body); font-weight: 400; font-size: 14px; color: #cfcfcf; }
 footer { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; text-align: center; color: #777; font-size: 12.5px; }
 .view[hidden] { display: none; }
 @media (prefers-reduced-motion: no-preference) { .cat { transition: transform .15s ease; } .cat:active { transform: scale(.985); } }
@@ -125,12 +123,6 @@ footer { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; text-align: c
   </section>
 </div>
 
-<div class="view" id="cat-hero" hidden>
-  <section class="hero hero-cat">
-    <div class="hero-text"><h1 id="cat-title"></h1><p id="cat-sub"></p></div>
-  </section>
-</div>
-
 <nav class="pills" aria-label="Categorie"><div class="pills-inner" id="pills"></div></nav>
 
 <main>
@@ -141,12 +133,7 @@ footer { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; text-align: c
       <p>Se hai allergie o intolleranze alimentari chiedi pure al personale: ti diremo cosa contiene ogni prodotto.</p>
     </section>
   </div>
-  <div class="view" id="category" hidden>
-
-    <div class="items" id="items"></div>
-    <p class="foot" id="cat-foot" hidden></p>
-    <button class="next" id="next" type="button"><span class="next-fill" id="next-fill"></span><span class="next-label" id="next-label"></span><span class="next-title" id="next-title"></span><span class="next-hint">Continua a scorrere o tocca qui</span></button>
-  </div>
+  <div class="view" id="category" hidden><div id="sections"></div></div>
 </main>
 <footer>Prezzi in euro. Chiedi pure al barman per varianti o drink senza alcol.</footer>
 
@@ -323,27 +310,22 @@ function itemHTML(it) {
   return `<article class="item${compact ? " compact" : ""}">${body}</article>`;
 }
 
-let nextTarget = null;
-const PULL_TOUCH = 90, PULL_WHEEL = 260;
-function setPull(v) { const f = document.getElementById("next-fill"); if (f) f.style.width = Math.min(100, v) + "%"; }
-function goNext() { if (nextTarget) go(nextTarget); else goHome(); }
-const inCat = () => document.body.classList.contains("in-cat");
-const atBottom = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
-let touchY = null, pulled = 0;
-window.addEventListener("touchstart", e => { touchY = inCat() && atBottom() ? e.touches[0].clientY : null; pulled = 0; }, { passive: true });
-window.addEventListener("touchmove", e => {
-  if (touchY === null) { if (inCat() && atBottom()) touchY = e.touches[0].clientY; return; }
-  pulled = touchY - e.touches[0].clientY; setPull(pulled / PULL_TOUCH * 100);
-}, { passive: true });
-window.addEventListener("touchend", () => { if (touchY !== null && pulled > PULL_TOUCH) goNext(); else setPull(0); touchY = null; pulled = 0; });
-let wheelSum = 0, wheelTimer;
-window.addEventListener("wheel", e => {
-  if (!inCat() || !atBottom() || e.deltaY <= 0) { wheelSum = 0; setPull(0); return; }
-  wheelSum += e.deltaY; setPull(wheelSum / PULL_WHEEL * 100);
-  clearTimeout(wheelTimer); wheelTimer = setTimeout(() => { wheelSum = 0; setPull(0); }, 600);
-  if (wheelSum > PULL_WHEEL) { wheelSum = 0; goNext(); }
-}, { passive: true });
-document.getElementById("next").addEventListener("click", goNext);
+const sectionsEl = document.getElementById("sections");
+sectionsEl.innerHTML = MENU.map(sec => `
+  <section class="sec" id="sec-${sec.id}" data-sec="${sec.id}">
+    <div class="hero hero-cat sec-hero"><div class="hero-text"><h2>${esc(sec.title)}</h2>${sec.sub ? `<p>${esc(sec.sub)}</p>` : ""}</div></div>
+    <div class="items">${sec.items.map(itemHTML).join("")}</div>
+    ${sec.foot ? `<p class="foot">* ${esc(sec.foot)}</p>` : ""}
+  </section>`).join("");
+const pillsBox = document.querySelector(".pills");
+const stickBottom = () => pillsBox.getBoundingClientRect().bottom;
+let activeId = null;
+function setActive(id) {
+  activeId = id;
+  pillsEl.querySelectorAll(".pill").forEach(b => b.setAttribute("aria-current", String(id ? b.dataset.id === id : !!b.dataset.home)));
+  const pill = id ? pillsEl.querySelector(`[data-id="${id}"]`) : null;
+  pillsEl.scrollTo({ left: pill ? pill.offsetLeft - (pillsEl.clientWidth - pill.offsetWidth) / 2 : 0, behavior: "smooth" });
+}
 function show() {
   const id = location.hash.slice(1);
   const sec = MENU.find(s => s.id === id);
@@ -351,25 +333,23 @@ function show() {
   document.getElementById("home").hidden = !!sec;
   document.getElementById("home-hero").hidden = !!sec;
   document.getElementById("category").hidden = !sec;
-  document.getElementById("cat-hero").hidden = !sec;
-  pillsEl.querySelectorAll(".pill").forEach(b => b.setAttribute("aria-current", String(sec ? b.dataset.id === sec.id : !!b.dataset.home)));
-  if (!sec) pillsEl.scrollTo({ left: 0, behavior: "smooth" });
-  if (sec) {
-    document.getElementById("cat-title").textContent = sec.title;
-    document.getElementById("cat-sub").textContent = sec.sub || "";
-    document.getElementById("items").innerHTML = sec.items.map(itemHTML).join("");
-    const idx = MENU.indexOf(sec), nxt = MENU[idx + 1];
-    nextTarget = nxt ? nxt.id : null;
-    document.getElementById("next-label").textContent = nxt ? "Prossima categoria" : "Hai visto tutto";
-    document.getElementById("next-title").textContent = nxt ? nxt.title : "Torna al menu";
-    setPull(0);
-    const foot = document.getElementById("cat-foot");
-    foot.hidden = !sec.foot; foot.textContent = sec.foot ? "* " + sec.foot : "";
-    const active = pillsEl.querySelector(`[data-id="${sec.id}"]`);
-    pillsEl.scrollTo({ left: active.offsetLeft - (pillsEl.clientWidth - active.offsetWidth) / 2, behavior: "smooth" });
-  }
-  window.scrollTo(0, 0);
+  if (!sec) { setActive(null); window.scrollTo(0, 0); return; }
+  setActive(sec.id);
+  const el = document.getElementById("sec-" + sec.id);
+  window.scrollTo(0, sec === MENU[0] ? 0 : el.getBoundingClientRect().top + window.scrollY - stickBottom() + 1);
 }
+let ticking = false;
+window.addEventListener("scroll", () => {
+  if (ticking || !document.body.classList.contains("in-cat")) return;
+  ticking = true;
+  requestAnimationFrame(() => {
+    ticking = false;
+    const line = stickBottom() + 24;
+    let cur = MENU[0].id;
+    for (const el of sectionsEl.children) { if (el.getBoundingClientRect().top <= line) cur = el.dataset.sec; else break; }
+    if (cur !== activeId) { setActive(cur); history.replaceState(null, "", "#" + cur); }
+  });
+}, { passive: true });
 const go = id => { if (location.hash.slice(1) === id) show(); else location.hash = id; };
 document.addEventListener("click", e => {
   if (e.target.closest("[data-home]")) { goHome(); return; }
