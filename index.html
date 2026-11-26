@@ -93,6 +93,12 @@ main { max-width: 640px; margin: 0 auto; padding: 4px 16px 48px; }
 .info { margin-top: 22px; background: var(--card); border-radius: 18px; padding: 24px 22px; text-align: center; display: grid; gap: 8px; }
 .info h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: .03em; }
 .info p { margin: 0; color: #cfcfcf; }
+.next { position: relative; overflow: hidden; display: grid; gap: 4px; width: 100%; margin-top: 26px; padding: 22px 20px 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); text-align: center; cursor: pointer; }
+.next-fill { position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: var(--paper); transition: width .08s linear; }
+.next-label { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.next-title { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: .04em; text-transform: uppercase; }
+.next-title::after { content: " ↓"; }
+.next-hint { font-size: 12.5px; color: #777; }
 footer { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; text-align: center; color: #777; font-size: 12.5px; }
 .view[hidden] { display: none; }
 @media (prefers-reduced-motion: no-preference) { .cat { transition: transform .15s ease; } .cat:active { transform: scale(.985); } }
@@ -139,6 +145,7 @@ footer { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; text-align: c
 
     <div class="items" id="items"></div>
     <p class="foot" id="cat-foot" hidden></p>
+    <button class="next" id="next" type="button"><span class="next-fill" id="next-fill"></span><span class="next-label" id="next-label"></span><span class="next-title" id="next-title"></span><span class="next-hint">Continua a scorrere o tocca qui</span></button>
   </div>
 </main>
 <footer>Prezzi in euro. Chiedi pure al barman per varianti o drink senza alcol.</footer>
@@ -316,6 +323,27 @@ function itemHTML(it) {
   return `<article class="item${compact ? " compact" : ""}">${body}</article>`;
 }
 
+let nextTarget = null;
+const PULL_TOUCH = 90, PULL_WHEEL = 260;
+function setPull(v) { const f = document.getElementById("next-fill"); if (f) f.style.width = Math.min(100, v) + "%"; }
+function goNext() { if (nextTarget) go(nextTarget); else goHome(); }
+const inCat = () => document.body.classList.contains("in-cat");
+const atBottom = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+let touchY = null, pulled = 0;
+window.addEventListener("touchstart", e => { touchY = inCat() && atBottom() ? e.touches[0].clientY : null; pulled = 0; }, { passive: true });
+window.addEventListener("touchmove", e => {
+  if (touchY === null) { if (inCat() && atBottom()) touchY = e.touches[0].clientY; return; }
+  pulled = touchY - e.touches[0].clientY; setPull(pulled / PULL_TOUCH * 100);
+}, { passive: true });
+window.addEventListener("touchend", () => { if (touchY !== null && pulled > PULL_TOUCH) goNext(); else setPull(0); touchY = null; pulled = 0; });
+let wheelSum = 0, wheelTimer;
+window.addEventListener("wheel", e => {
+  if (!inCat() || !atBottom() || e.deltaY <= 0) { wheelSum = 0; setPull(0); return; }
+  wheelSum += e.deltaY; setPull(wheelSum / PULL_WHEEL * 100);
+  clearTimeout(wheelTimer); wheelTimer = setTimeout(() => { wheelSum = 0; setPull(0); }, 600);
+  if (wheelSum > PULL_WHEEL) { wheelSum = 0; goNext(); }
+}, { passive: true });
+document.getElementById("next").addEventListener("click", goNext);
 function show() {
   const id = location.hash.slice(1);
   const sec = MENU.find(s => s.id === id);
@@ -330,6 +358,11 @@ function show() {
     document.getElementById("cat-title").textContent = sec.title;
     document.getElementById("cat-sub").textContent = sec.sub || "";
     document.getElementById("items").innerHTML = sec.items.map(itemHTML).join("");
+    const idx = MENU.indexOf(sec), nxt = MENU[idx + 1];
+    nextTarget = nxt ? nxt.id : null;
+    document.getElementById("next-label").textContent = nxt ? "Prossima categoria" : "Hai visto tutto";
+    document.getElementById("next-title").textContent = nxt ? nxt.title : "Torna al menu";
+    setPull(0);
     const foot = document.getElementById("cat-foot");
     foot.hidden = !sec.foot; foot.textContent = sec.foot ? "* " + sec.foot : "";
     const active = pillsEl.querySelector(`[data-id="${sec.id}"]`);
