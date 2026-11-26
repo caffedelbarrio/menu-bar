@@ -325,7 +325,8 @@ function setActive(id) {
   pillsEl.querySelectorAll(".pill").forEach(b => b.setAttribute("aria-current", String(id ? b.dataset.id === id : !!b.dataset.home)));
   const pill = id ? pillsEl.querySelector(`[data-id="${id}"]`) : null;
   const max = pillsEl.scrollWidth - pillsEl.clientWidth;
-  const target = pill ? Math.max(0, Math.min(max, pill.offsetLeft - (pillsEl.clientWidth - pill.offsetWidth) / 2)) : 0;
+  const offset = pill ? pill.getBoundingClientRect().left - pillsEl.getBoundingClientRect().left + pillsEl.scrollLeft : 0;
+  const target = pill ? Math.max(0, Math.min(max, offset - (pillsEl.clientWidth - pill.offsetWidth) / 2)) : 0;
   slidePills(target);
 }
 // Animazione manuale: i browser dei telefoni interrompono lo scorrimento "smooth" mentre la pagina scorre
