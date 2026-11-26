@@ -324,7 +324,22 @@ function setActive(id) {
   activeId = id;
   pillsEl.querySelectorAll(".pill").forEach(b => b.setAttribute("aria-current", String(id ? b.dataset.id === id : !!b.dataset.home)));
   const pill = id ? pillsEl.querySelector(`[data-id="${id}"]`) : null;
-  pillsEl.scrollTo({ left: pill ? pill.offsetLeft - (pillsEl.clientWidth - pill.offsetWidth) / 2 : 0, behavior: "smooth" });
+  const max = pillsEl.scrollWidth - pillsEl.clientWidth;
+  const target = pill ? Math.max(0, Math.min(max, pill.offsetLeft - (pillsEl.clientWidth - pill.offsetWidth) / 2)) : 0;
+  slidePills(target);
+}
+// Animazione manuale: i browser dei telefoni interrompono lo scorrimento "smooth" mentre la pagina scorre
+let slideRaf = null;
+function slidePills(target) {
+  cancelAnimationFrame(slideRaf);
+  const start = pillsEl.scrollLeft, dist = target - start, t0 = performance.now(), dur = 260;
+  if (Math.abs(dist) < 1) return;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    pillsEl.scrollLeft = start + dist * e;
+    if (k < 1) slideRaf = requestAnimationFrame(step);
+  };
+  slideRaf = requestAnimationFrame(step);
 }
 function show() {
   const id = location.hash.slice(1);
@@ -347,6 +362,7 @@ window.addEventListener("scroll", () => {
     const line = stickBottom() + 24;
     let cur = MENU[0].id;
     for (const el of sectionsEl.children) { if (el.getBoundingClientRect().top <= line) cur = el.dataset.sec; else break; }
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = MENU[MENU.length - 1].id;
     if (cur !== activeId) { setActive(cur); history.replaceState(null, "", "#" + cur); }
   });
 }, { passive: true });
