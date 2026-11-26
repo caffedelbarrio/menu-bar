@@ -73,6 +73,7 @@ main { max-width: 640px; margin: 0 auto; padding: 4px 16px 48px; }
 .item { background: var(--card); border-radius: 18px; padding: 20px 20px 22px; display: grid; gap: 8px; }
 .item.has-img { grid-template-columns: 92px 1fr; gap: 16px; align-items: start; padding: 16px; }
 .item.has-img .thumb { width: 92px; height: 123px; object-fit: cover; border-radius: 12px; background: #000; }
+.item.has-img .thumb.logo { object-fit: contain; background: transparent; height: 100px; border-radius: 0; }
 .item-body { display: grid; gap: 8px; min-width: 0; }
 .item.compact { padding: 16px 20px; }
 .item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
@@ -205,8 +206,8 @@ const MENU = [
     { n: "Grappa bianca", p: 4 }, { n: "Grappa barricata", p: 4 },
   ]},
   { id: "spina", title: "Birre alla spina", sub: "Forst alla spina, bionda o rossa", items: [
-    { n: "Forst Premium", g: "Bionda", sizes: [["0,2 l", 3], ["0,3 l", 3.5], ["0,4 l", 4.5], ["0,5 l", 5.5], ["Caraffa 1 l", 10]] },
-    { n: "Forst Sixtus", g: "Rossa doppio malto", sizes: [["0,2 l", 3.5], ["0,3 l", 4], ["0,4 l", 5], ["0,5 l", 6], ["Caraffa 1 l", 11]] },
+    { n: "Forst Premium", img: "img/birre/forst-premium.png", logo: true, g: "Bionda", sizes: [["0,2 l", 3], ["0,3 l", 3.5], ["0,4 l", 4.5], ["0,5 l", 5.5], ["Caraffa 1 l", 10]] },
+    { n: "Forst Sixtus", img: "img/birre/forst-sixtus.png", logo: true, g: "Rossa doppio malto", sizes: [["0,2 l", 3.5], ["0,3 l", 4], ["0,4 l", 5], ["0,5 l", 6], ["Caraffa 1 l", 11]] },
   ]},
   { id: "vini", title: "Vini bianchi, Franciacorta e Champagne", sub: "La nostra carta vini", items: [
     { n: "Tufilla, Simone Capecci", p: 25, g: "Passerina, 12,5%" },
@@ -311,7 +312,7 @@ function itemHTML(it) {
   const compact = !meta && !desc && !sizes && !tags;
   const body = `<div class="item-top"><h3>${esc(it.n)}</h3>${it.p != null ? `<span class="price">${price(it.p)}</span>` : ""}</div>
     ${meta}${desc}${sizes}${tags}`;
-  if (it.img) return `<article class="item has-img"><img class="thumb" src="${it.img}" alt="Bottiglia di ${esc(it.n)}" width="360" height="480" loading="lazy"><div class="item-body">${body}</div></article>`;
+  if (it.img) return `<article class="item has-img"><img class="thumb${it.logo ? " logo" : ""}" src="${it.img}" alt="${it.logo ? "Logo" : "Bottiglia"} di ${esc(it.n)}" width="360" height="480" loading="lazy"><div class="item-body">${body}</div></article>`;
   return `<article class="item${compact ? " compact" : ""}">${body}</article>`;
 }
 
