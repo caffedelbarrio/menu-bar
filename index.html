@@ -97,6 +97,12 @@ main { max-width: 640px; margin: 0 auto; padding: 4px 16px 48px; }
 .sec:first-child .sec-hero { margin-top: 6px; }
 .sec-hero h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(24px, 7vw, 32px); letter-spacing: .05em; text-transform: uppercase; line-height: 1.05; text-wrap: balance; }
 .hero.sec-hero p { letter-spacing: .02em; text-transform: none; font-family: var(--body); font-weight: 400; font-size: 14px; color: #cfcfcf; }
+.review { margin-top: 22px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 26px 22px; text-align: center; display: grid; gap: 10px; justify-items: center; }
+.review .stars { font-size: 22px; letter-spacing: .25em; color: var(--paper); }
+.review h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: .03em; text-transform: uppercase; }
+.review p { margin: 0; color: #cfcfcf; max-width: 34ch; }
+.review-btn { margin-top: 6px; display: inline-block; background: var(--paper); color: var(--ink); text-decoration: none; font-family: var(--display); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: 15px; padding: 14px 24px 12px; border-radius: 999px; }
+.review-btn:active { transform: scale(.98); }
 footer { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; text-align: center; color: #777; font-size: 12.5px; }
 .view[hidden] { display: none; }
 @media (prefers-reduced-motion: no-preference) { .cat { transition: transform .15s ease; } .cat:active { transform: scale(.985); } }
@@ -128,12 +134,25 @@ footer { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; text-align: c
 <main>
   <div class="view" id="home">
     <div class="cats" id="cats"></div>
+    <section class="review">
+      <div class="stars" aria-hidden="true">★★★★★</div>
+      <h2>Ti siamo piaciuti?</h2>
+      <p>Lasciaci una recensione su Google: ci vuole un minuto e per noi vale tantissimo.</p>
+      <a class="review-btn" href="https://search.google.com/local/writereview?placeid=ChIJR2fcPsr3MRMRC2Vubx_RHVU" target="_blank" rel="noopener">Scrivi una recensione</a>
+    </section>
     <section class="info">
       <h2>Allergeni</h2>
       <p>Se hai allergie o intolleranze alimentari chiedi pure al personale: ti diremo cosa contiene ogni prodotto.</p>
     </section>
   </div>
-  <div class="view" id="category" hidden><div id="sections"></div></div>
+  <div class="view" id="category" hidden><div id="sections"></div>
+    <section class="review">
+      <div class="stars" aria-hidden="true">★★★★★</div>
+      <h2>Ti siamo piaciuti?</h2>
+      <p>Lasciaci una recensione su Google: ci vuole un minuto e per noi vale tantissimo.</p>
+      <a class="review-btn" href="https://search.google.com/local/writereview?placeid=ChIJR2fcPsr3MRMRC2Vubx_RHVU" target="_blank" rel="noopener">Scrivi una recensione</a>
+    </section>
+  </div>
 </main>
 <footer>Prezzi in euro. Chiedi pure al barman per varianti o drink senza alcol.</footer>
 
